@@ -16,7 +16,7 @@ from espnet.nets.pytorch_backend.transformer.embedding import (  # noqa: H301
 )
 from hnet_modules.components import ChunkLayer, DeChunkLayer, RoutingModule
 from hnet_modules.multilayer_perceptron import SwiGLU
-from mamba_ssm import Mamba2
+from mamba.mamba_ssm.modules.mamba2 import Mamba2
 
 class HNetEncoder(AbsEncoder):
     @typechecked

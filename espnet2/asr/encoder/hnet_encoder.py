@@ -61,6 +61,9 @@ class HNetEncoder(AbsEncoder):
         if out_dim is None:
             out_dim = enc_dim
         self.decoder = nn.Linear(enc_dim, out_dim)
+    
+    def output_size(self) -> int:
+        return self.out_dim
 
     def forward(
         self,

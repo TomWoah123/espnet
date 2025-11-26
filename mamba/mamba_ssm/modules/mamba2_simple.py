@@ -13,7 +13,7 @@ except ImportError:
     causal_conv1d_fn = None
 
 try:
-    from mamba_ssm.ops.triton.layernorm_gated import RMSNorm as RMSNormGated, LayerNorm
+    from mamba.mamba_ssm.ops.triton.layernorm_gated import RMSNorm as RMSNormGated, LayerNorm
 except ImportError:
     RMSNormGated, LayerNorm = None, None
 

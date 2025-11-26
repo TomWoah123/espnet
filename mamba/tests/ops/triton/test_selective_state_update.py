@@ -8,7 +8,7 @@ import pytest
 
 from einops import rearrange, repeat
 
-from mamba_ssm.ops.triton.selective_state_update import selective_state_update, selective_state_update_ref
+from mamba.mamba_ssm.ops.triton.selective_state_update import selective_state_update, selective_state_update_ref
 
 
 @pytest.mark.parametrize("itype", [torch.float32, torch.float16, torch.bfloat16])

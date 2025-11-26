@@ -7,7 +7,7 @@ import pytest
 
 from einops import rearrange, repeat
 
-from mamba_ssm.ops.triton.layernorm_gated import layernorm_fn, rms_norm_ref
+from mamba.mamba_ssm.ops.triton.layernorm_gated import layernorm_fn, rms_norm_ref
 
 
 @pytest.mark.parametrize("norm_before_gate", [True, False])

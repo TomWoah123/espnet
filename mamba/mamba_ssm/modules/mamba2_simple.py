@@ -17,8 +17,8 @@ try:
 except ImportError:
     RMSNormGated, LayerNorm = None, None
 
-from mamba_ssm.ops.triton.ssd_combined import mamba_chunk_scan_combined
-from mamba_ssm.ops.triton.ssd_combined import mamba_split_conv1d_scan_combined
+from mamba.mamba_ssm.ops.triton.ssd_combined import mamba_chunk_scan_combined
+from mamba.mamba_ssm.ops.triton.ssd_combined import mamba_split_conv1d_scan_combined
 
 
 class Mamba2Simple(nn.Module):

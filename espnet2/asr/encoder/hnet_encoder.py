@@ -14,8 +14,8 @@ from espnet.nets.pytorch_backend.transformer.embedding import (  # noqa: H301
     ConvolutionalPositionalEmbedding,
     PositionalEncoding,
 )
-from hnet_modules.components import ChunkLayer, DeChunkLayer, RoutingModule
-from hnet_modules.multilayer_perceptron import SwiGLU
+from espnet2.asr.encoder.hnet_modules.components import ChunkLayer, DeChunkLayer, RoutingModule
+from espnet2.asr.encoder.hnet_modules.multilayer_perceptron import SwiGLU
 from mamba.mamba_ssm.modules.mamba2 import Mamba2
 
 class HNetEncoder(AbsEncoder):

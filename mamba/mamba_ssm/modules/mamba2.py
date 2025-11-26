@@ -19,17 +19,17 @@ except ImportError:
     causal_conv1d_varlen_states = None
 
 try:
-    from mamba_ssm.ops.triton.selective_state_update import selective_state_update
+    from mamba.mamba_ssm.ops.triton.selective_state_update import selective_state_update
 except ImportError:
     selective_state_update = None
 
-from mamba_ssm.ops.triton.layernorm_gated import RMSNorm as RMSNormGated
+from mamba.mamba_ssm.ops.triton.layernorm_gated import RMSNorm as RMSNormGated
 
-from mamba_ssm.distributed.tensor_parallel import ColumnParallelLinear, RowParallelLinear
-from mamba_ssm.distributed.distributed_utils import all_reduce, reduce_scatter
+from mamba.mamba_ssm.distributed.tensor_parallel import ColumnParallelLinear, RowParallelLinear
+from mamba.mamba_ssm.distributed.distributed_utils import all_reduce, reduce_scatter
 
-from mamba_ssm.ops.triton.ssd_combined import mamba_chunk_scan_combined
-from mamba_ssm.ops.triton.ssd_combined import mamba_split_conv1d_scan_combined
+from mamba.mamba_ssm.ops.triton.ssd_combined import mamba_chunk_scan_combined
+from mamba.mamba_ssm.ops.triton.ssd_combined import mamba_split_conv1d_scan_combined
 
 from huggingface_hub import PyTorchModelHubMixin
 

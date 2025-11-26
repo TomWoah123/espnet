@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 from einops import repeat, rearrange
 
-from mamba_ssm.ops.triton.ssd_combined import mamba_chunk_scan_combined
+from mamba.mamba_ssm.ops.triton.ssd_combined import mamba_chunk_scan_combined
 
 from utils import get_seq_idx
 

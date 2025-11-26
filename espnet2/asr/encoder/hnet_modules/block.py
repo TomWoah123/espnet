@@ -4,7 +4,7 @@ from typing import Optional
 from torch import nn, Tensor
 
 from flash_attn.ops.triton.layer_norm import RMSNorm
-from mamba_ssm.modules.mamba2 import Mamba2
+from mamba.mamba_ssm.modules.mamba2 import Mamba2
 
 from espnet2.asr.encoder.hnet_modules.multihead_attention import CausalMHA
 from multilayer_perceptron import SwiGLU

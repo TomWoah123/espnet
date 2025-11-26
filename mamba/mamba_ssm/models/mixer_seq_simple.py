@@ -11,14 +11,14 @@ from collections import namedtuple
 import torch
 import torch.nn as nn
 
-from mamba_ssm.models.config_mamba import MambaConfig
-from mamba_ssm.modules.mamba_simple import Mamba
-from mamba_ssm.modules.mamba2 import Mamba2
-from mamba_ssm.modules.mha import MHA
-from mamba_ssm.modules.mlp import GatedMLP
-from mamba_ssm.modules.block import Block
-from mamba_ssm.utils.generation import GenerationMixin
-from mamba_ssm.utils.hf import load_config_hf, load_state_dict_hf
+from mamba.mamba_ssm.models.config_mamba import MambaConfig
+from mamba.mamba_ssm.modules.mamba_simple import Mamba
+from mamba.mamba_ssm.modules.mamba2 import Mamba2
+from mamba.mamba_ssm.modules.mha import MHA
+from mamba.mamba_ssm.modules.mlp import GatedMLP
+from mamba.mamba_ssm.modules.block import Block
+from mamba.mamba_ssm.utils.generation import GenerationMixin
+from mamba.mamba_ssm.utils.hf import load_config_hf, load_state_dict_hf
 
 try:
     from mamba_ssm.ops.triton.layer_norm import RMSNorm, layer_norm_fn, rms_norm_fn

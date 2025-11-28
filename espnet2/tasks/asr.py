@@ -32,6 +32,7 @@ from espnet2.asr.encoder.conformer_encoder import ConformerEncoder
 from espnet2.asr.encoder.contextual_block_conformer_encoder import (
     ContextualBlockConformerEncoder,
 )
+from espnet2.asr.encoder.hnet_encoder import HNetEncoder
 from espnet2.asr.encoder.contextual_block_transformer_encoder import (
     ContextualBlockTransformerEncoder,
 )
@@ -152,6 +153,7 @@ encoder_choices = ClassChoices(
     classes=dict(
         conformer=ConformerEncoder,
         transformer=TransformerEncoder,
+        hnet=HNetEncoder,
         transformer_multispkr=TransformerEncoderMultiSpkr,
         contextual_block_transformer=ContextualBlockTransformerEncoder,
         contextual_block_conformer=ContextualBlockConformerEncoder,

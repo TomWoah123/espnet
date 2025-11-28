@@ -132,9 +132,9 @@ with open(version_file, "r") as f:
 setup(
     name="espnet",
     version=version,
-    url="http://github.com/espnet/espnet",
-    author="Shinji Watanabe",
-    author_email="shinjiw@ieee.org",
+    url="http://github.com/TomWoah123/espnet",
+    author="Timothy Wu",
+    author_email="tpwu@andrew.cmu.edu",
     description="ESPnet: end-to-end speech processing toolkit",
     long_description=open(os.path.join(dirname, "README.md"), encoding="utf-8").read(),
     long_description_content_type="text/markdown",

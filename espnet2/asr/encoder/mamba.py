@@ -60,7 +60,6 @@ class Mamba(nn.Module):
         super().__init__()
         self.args = args
         
-        self.embedding = nn.Embedding(args.vocab_size, args.d_model)
         self.layers = nn.ModuleList([ResidualBlock(args) for _ in range(args.n_layer)])
         self.norm_f = RMSNorm(args.d_model)
 
@@ -69,7 +68,7 @@ class Mamba(nn.Module):
                                                      # See "Weight Tying" paper
 
 
-    def forward(self, input_ids):
+    def forward(self, inputs):
         """
         Args:
             input_ids (long tensor): shape (b, l)    (See Glossary at top for definitions of b, l, d_in, n...)
@@ -81,7 +80,7 @@ class Mamba(nn.Module):
             class MambaLMHeadModel, https://github.com/state-spaces/mamba/blob/main/mamba_ssm/models/mixer_seq_simple.py#L173
 
         """
-        x = self.embedding(input_ids)
+        x = inputs
         
         for layer in self.layers:
             x = layer(x)

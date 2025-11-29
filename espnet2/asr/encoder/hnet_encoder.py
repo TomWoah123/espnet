@@ -96,7 +96,7 @@ class HNetEncoder(AbsEncoder):
         # Restores Sequence Length
         self.dechunking_proj = nn.Sequential(
             nn.ConvTranspose1d(hidden_size, hidden_size, kernel_size=downsample_rate, stride=downsample_rate),
-            nn.LayerNorm(hidden_size)
+            nn.BatchNorm1d(hidden_size)
         )
 
         # 6. Decoder (D) - Fine-grained reconstruction

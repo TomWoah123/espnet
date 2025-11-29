@@ -60,6 +60,7 @@ class Mamba(nn.Module):
         super().__init__()
         self.args = args
         
+        self.embedding = nn.Embedding(args.vocab_size, args.d_model)
         self.layers = nn.ModuleList([ResidualBlock(args) for _ in range(args.n_layer)])
         self.norm_f = RMSNorm(args.d_model)
 

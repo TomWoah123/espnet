@@ -128,14 +128,14 @@ class HNetEncoder(AbsEncoder):
             masks = ~masks[:, None, :]
         
         x_emb = self.embed(xs_pad)  # (B, T, D)
-        print(f"EMBEDDED.....{x_emb.shape}")
+        # print(f"EMBEDDED.....{x_emb.shape}")
 
         # --- 2. Encoder (E) ---
         x = x_emb
         for layer in self.encoder_layers:
             x = layer(x)
         x_enc = self.norm_enc(x) # (B, T, D)
-        print(f"ENCODER.......{x_enc.shape}")
+        # print(f"ENCODER.......{x_enc.shape}")
 
         # --- 3. Chunking ---
         # Adjust lengths for padding
@@ -144,7 +144,7 @@ class HNetEncoder(AbsEncoder):
             pad_len = self.downsample_rate - (T % self.downsample_rate)
             x_enc = F.pad(x_enc, (0, 0, 0, pad_len)) # Pad time dimension
         
-        print(f"CHUNKING.........{x_enc.shape}")
+        # print(f"CHUNKING.........{x_enc.shape}")
         # Permute for Conv1d (B, D, T)
         x_permuted = x_enc.transpose(1, 2)
         x_chunked = self.chunking_proj(x_permuted)
@@ -152,7 +152,7 @@ class HNetEncoder(AbsEncoder):
         
         # Update lengths (integer division)
         ilens_sub = torch.ceil(ilens / self.downsample_rate).long()
-        print(f"AFTER CHUNKING............{x_chunked.shape}")
+        # print(f"AFTER CHUNKING............{x_chunked.shape}")
 
         # --- 4. Main Network (M) ---
         x_main = x_chunked
@@ -160,7 +160,7 @@ class HNetEncoder(AbsEncoder):
             x_main = layer(x_main)
         x_main = self.norm_main(x_main)
 
-        print(f"MAIN NETWORK.................{x_main.shape}")
+        # print(f"MAIN NETWORK.................{x_main.shape}")
 
         # --- 5. Dechunking ---
         x_main_permuted = x_main.transpose(1, 2)
@@ -174,27 +174,27 @@ class HNetEncoder(AbsEncoder):
             # Should not happen if padding was correct, but safety first
             x_dechunked = F.pad(x_dechunked, (0, 0, 0, T - x_dechunked.size(1)))
         
-        print(f"DECHUNKING..............{x_dechunked.shape}")
+        # print(f"DECHUNKING..............{x_dechunked.shape}")
 
         # Remove the padding we added before Chunking if necessary to match x_emb
         original_T = x_emb.size(1)
         x_dechunked = x_dechunked[:, :original_T, :]
-        print(f"AFTER REMOVING PADDING.............{x_dechunked.shape}")
+        # print(f"AFTER REMOVING PADDING.............{x_dechunked.shape}")
 
         # --- 6. Decoder (D) ---
         x_dec = x_dechunked
         for layer in self.decoder_layers:
             x_dec = layer(x_dec)
         x_dec = self.norm_dec(x_dec)
-        print(f"DECODING..............{x_dec.shape}")
+        # print(f"DECODING..............{x_dec.shape}")
 
         # --- 7. Residual Connection & Output ---
         # "Decoder + Encoder" (Skip connection from start to finish)
         x_final = x_dec + x_emb
-        print(f"FINAL SHAPE...........{x_final.shape}")
+        # print(f"FINAL SHAPE...........{x_final.shape}")
 
         # Final Linear Projection
         output = self.output_proj(x_final)
-        print(f"PROJECTION..............{output.shape}")
+        # print(f"PROJECTION..............{output.shape}")
 
-        return output, ilens_sub, masks
+        return output, ilens, masks

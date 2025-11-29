@@ -146,9 +146,9 @@ class HNetEncoder(AbsEncoder):
         
         print(f"CHUNKING.........{x_enc.shape}")
         # Permute for Conv1d (B, D, T)
-        x_permuted = x_enc.transpose(1, 2)
-        x_chunked = self.chunking_proj(x_permuted)
-        x_chunked = x_chunked.transpose(1, 2) # Back to (B, T_sub, D)
+        # x_permuted = x_enc.transpose(1, 2)
+        x_chunked = self.chunking_proj(x_enc)
+        # x_chunked = x_chunked.transpose(1, 2) # Back to (B, T_sub, D)
         
         # Update lengths (integer division)
         ilens_sub = torch.ceil(ilens / self.downsample_rate).long()

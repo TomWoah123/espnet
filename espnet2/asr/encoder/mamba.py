@@ -34,7 +34,7 @@ from einops import rearrange, repeat, einsum
 class ModelArgs:
     d_model: int = 256
     n_layer: int = 4
-    vocab_size: int = 5000
+    vocab_size: int = 256
     d_state: int = 16
     expand: int = 2
     dt_rank: Union[int, str] = 'auto'

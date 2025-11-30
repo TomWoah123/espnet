@@ -1,0 +1,219 @@
+2025-11-30 08:41:51,528 (launch:94) INFO: /ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/bin/python3 /ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/launch.py --cmd 'run.pl --name exp/asr_train_asr_raw_en_bpe5000_sp/train.log' --log exp/asr_train_asr_raw_en_bpe5000_sp/train.log --ngpu 1 --num_nodes 1 --init_file_prefix exp/asr_train_asr_raw_en_bpe5000_sp/.dist_init_ --multiprocessing_distributed true -- python3 -m espnet2.bin.asr_train --use_preprocessor true --bpemodel data/en_token_list/bpe_unigram5000/bpe.model --token_type bpe --token_list data/en_token_list/bpe_unigram5000/tokens.txt --non_linguistic_symbols none --cleaner none --g2p none --valid_data_path_and_name_and_type dump/raw/dev/wav.scp,speech,kaldi_ark --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape --resume true --ignore_init_mismatch false --fold_length 80000 --output_dir exp/asr_train_asr_raw_en_bpe5000_sp --config conf/train_asr.yaml --frontend_conf fs=16k --normalize=global_mvn --normalize_conf stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape --fold_length 150 --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/text,text,text --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe --valid_data_path_and_name_and_type dump/raw/dev/text,text,text --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe
+2025-11-30 08:41:51,632 (launch:348) INFO: log file: exp/asr_train_asr_raw_en_bpe5000_sp/train.log
+run.pl: job failed, log is in exp/asr_train_asr_raw_en_bpe5000_sp/train.log
+Command '['run.pl', '--name', 'exp/asr_train_asr_raw_en_bpe5000_sp/train.log', '--gpu', '1', 'exp/asr_train_asr_raw_en_bpe5000_sp/train.log', 'python3', '-m', 'espnet2.bin.asr_train', '--use_preprocessor', 'true', '--bpemodel', 'data/en_token_list/bpe_unigram5000/bpe.model', '--token_type', 'bpe', '--token_list', 'data/en_token_list/bpe_unigram5000/tokens.txt', '--non_linguistic_symbols', 'none', '--cleaner', 'none', '--g2p', 'none', '--valid_data_path_and_name_and_type', 'dump/raw/dev/wav.scp,speech,kaldi_ark', '--valid_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape', '--resume', 'true', '--ignore_init_mismatch', 'false', '--fold_length', '80000', '--output_dir', 'exp/asr_train_asr_raw_en_bpe5000_sp', '--config', 'conf/train_asr.yaml', '--frontend_conf', 'fs=16k', '--normalize=global_mvn', '--normalize_conf', 'stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz', '--train_data_path_and_name_and_type', 'dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark', '--train_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape', '--fold_length', '150', '--train_data_path_and_name_and_type', 'dump/raw/train_clean_100_sp/text,text,text', '--train_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe', '--valid_data_path_and_name_and_type', 'dump/raw/dev/text,text,text', '--valid_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe', '--ngpu', '1', '--multiprocessing_distributed', 'True']' returned non-zero exit status 1.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/launch.py", line 384, in <module>
+    main()
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/launch.py", line 375, in main
+    raise RuntimeError(
+RuntimeError: 
+################### The last 1000 lines of exp/asr_train_asr_raw_en_bpe5000_sp/train.log ###################
+# python3 -m espnet2.bin.asr_train --use_preprocessor true --bpemodel data/en_token_list/bpe_unigram5000/bpe.model --token_type bpe --token_list data/en_token_list/bpe_unigram5000/tokens.txt --non_linguistic_symbols none --cleaner none --g2p none --valid_data_path_and_name_and_type dump/raw/dev/wav.scp,speech,kaldi_ark --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape --resume true --ignore_init_mismatch false --fold_length 80000 --output_dir exp/asr_train_asr_raw_en_bpe5000_sp --config conf/train_asr.yaml --frontend_conf fs=16k --normalize=global_mvn --normalize_conf stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape --fold_length 150 --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/text,text,text --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe --valid_data_path_and_name_and_type dump/raw/dev/text,text,text --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe --ngpu 1 --multiprocessing_distributed True 
+# Started at Sun Nov 30 08:41:51 EST 2025
+#
+/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/bin/python3 /ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/asr_train.py --use_preprocessor true --bpemodel data/en_token_list/bpe_unigram5000/bpe.model --token_type bpe --token_list data/en_token_list/bpe_unigram5000/tokens.txt --non_linguistic_symbols none --cleaner none --g2p none --valid_data_path_and_name_and_type dump/raw/dev/wav.scp,speech,kaldi_ark --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape --resume true --ignore_init_mismatch false --fold_length 80000 --output_dir exp/asr_train_asr_raw_en_bpe5000_sp --config conf/train_asr.yaml --frontend_conf fs=16k --normalize=global_mvn --normalize_conf stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape --fold_length 150 --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/text,text,text --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe --valid_data_path_and_name_and_type dump/raw/dev/text,text,text --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe --ngpu 1 --multiprocessing_distributed True
+[v020] 2025-11-30 08:43:39,043 (asr:538) INFO: Vocabulary size: 5000
+/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/lib/python3.11/site-packages/torch/nn/modules/transformer.py:385: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  warnings.warn(
+[v020] 2025-11-30 08:43:50,664 (espnet_model:186) WARNING: Set decoder to none as ctc_weight==1.0
+[v020] 2025-11-30 08:43:51,021 (abs_task:1455) INFO: pytorch.version=2.6.0+cu126, cuda.available=True, cudnn.version=90501, cudnn.benchmark=False, cudnn.deterministic=True
+[v020] 2025-11-30 08:43:51,035 (abs_task:1456) INFO: Model structure:
+ESPnetASRModel(
+  (frontend): DefaultFrontend(
+    (stft): Stft(n_fft=512, win_length=400, hop_length=160, center=True, normalized=False, onesided=True)
+    (frontend): Frontend()
+    (logmel): LogMel(sr=16000, n_fft=512, n_mels=80, fmin=0, fmax=8000.0, htk=False)
+  )
+  (specaug): SpecAug(
+    (time_warp): TimeWarp(window=5, mode=bicubic)
+    (freq_mask): MaskAlongAxis(mask_width_range=[0, 27], num_mask=2, axis=freq)
+    (time_mask): MaskAlongAxisVariableMaxWidth(mask_width_ratio_range=[0.0, 0.05], num_mask=5, axis=time)
+  )
+  (normalize): GlobalMVN(stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz, norm_means=True, norm_vars=True)
+  (encoder): HNetEncoder(
+    (embed): Sequential(
+      (0): Linear(in_features=80, out_features=256, bias=True)
+      (1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+      (2): Dropout(p=0.1, inplace=False)
+    )
+    (encoder_layers): ModuleList(
+      (0-1): 2 x ResidualBlock(
+        (mixer): MambaBlock(
+          (in_proj): Linear(in_features=256, out_features=1024, bias=False)
+          (conv1d): Conv1d(512, 512, kernel_size=(4,), stride=(1,), padding=(3,), groups=512)
+          (x_proj): Linear(in_features=512, out_features=48, bias=False)
+          (dt_proj): Linear(in_features=16, out_features=512, bias=True)
+          (out_proj): Linear(in_features=512, out_features=256, bias=False)
+        )
+        (norm): RMSNorm()
+      )
+    )
+    (norm_enc): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+    (chunking_proj): Sequential(
+      (0): Conv1d(256, 256, kernel_size=(4,), stride=(4,))
+      (1): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (main_layers): TransformerEncoder(
+      (layers): ModuleList(
+        (0-1): 2 x TransformerEncoderLayer(
+          (self_attn): MultiheadAttention(
+            (out_proj): NonDynamicallyQuantizableLinear(in_features=256, out_features=256, bias=True)
+          )
+          (linear1): Linear(in_features=256, out_features=1024, bias=True)
+          (dropout): Dropout(p=0.1, inplace=False)
+          (linear2): Linear(in_features=1024, out_features=256, bias=True)
+          (norm1): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (norm2): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+          (dropout1): Dropout(p=0.1, inplace=False)
+          (dropout2): Dropout(p=0.1, inplace=False)
+        )
+      )
+    )
+    (norm_main): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+    (dechunking_proj): Sequential(
+      (0): ConvTranspose1d(256, 256, kernel_size=(4,), stride=(4,))
+      (1): BatchNorm1d(256, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    )
+    (decoder_layers): ModuleList(
+      (0-1): 2 x ResidualBlock(
+        (mixer): MambaBlock(
+          (in_proj): Linear(in_features=256, out_features=1024, bias=False)
+          (conv1d): Conv1d(512, 512, kernel_size=(4,), stride=(1,), padding=(3,), groups=512)
+          (x_proj): Linear(in_features=512, out_features=48, bias=False)
+          (dt_proj): Linear(in_features=16, out_features=512, bias=True)
+          (out_proj): Linear(in_features=512, out_features=256, bias=False)
+        )
+        (norm): RMSNorm()
+      )
+    )
+    (norm_dec): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+    (output_proj): Linear(in_features=256, out_features=256, bias=True)
+  )
+  (criterion_att): LabelSmoothingLoss(
+    (criterion): KLDivLoss()
+  )
+  (ctc): CTC(
+    (ctc_lo): Linear(in_features=256, out_features=5000, bias=True)
+    (ctc_loss): CTCLoss()
+  )
+)
+
+Model summary:
+    Class Name: ESPnetASRModel
+    Total Number of model parameters: 5.23 M
+    Number of trainable parameters: 5.23 M (100.0%)
+    Size: 20.92 MB
+    Type: torch.float32
+[v020] 2025-11-30 08:43:51,035 (abs_task:1459) INFO: Optimizer:
+Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    initial_lr: 0.002
+    lr: 1.3333333333333336e-07
+    maximize: False
+    weight_decay: 1e-06
+)
+[v020] 2025-11-30 08:43:51,035 (abs_task:1460) INFO: Scheduler: WarmupLR(warmup_steps=15000)
+[v020] 2025-11-30 08:43:51,036 (abs_task:1469) INFO: Saving the configuration in exp/asr_train_asr_raw_en_bpe5000_sp/config.yaml
+[v020] 2025-11-30 08:43:51,806 (abs_task:1885) INFO: [train] Batch sampler: NumElementsBatchSampler(N-batch=16120, batch_bins=2000000, sort_in_batch=descending, sort_batch=descending)
+[v020] 2025-11-30 08:43:51,809 (abs_task:1886) INFO: [train] mini-batch sizes summary: N-batch=16120, mean=5.3, min=1, max=32
+[v020] 2025-11-30 08:43:51,970 (read_text:31) INFO: keys_to_load is not None, only loading 85617 keys from dump/raw/train_clean_100_sp/text
+[v020] 2025-11-30 08:43:52,472 (asr:510) INFO: Optional Data Names: ('text_spk2', 'text_spk3', 'text_spk4', 'prompt')
+[v020] 2025-11-30 08:43:52,474 (abs_task:1910) INFO: [train] dataset:
+ESPnetDataset(
+  speech: {"path": "dump/raw/train_clean_100_sp/wav.scp", "type": "kaldi_ark"}
+  text: {"path": "dump/raw/train_clean_100_sp/text", "type": "text"}
+  preprocess: <espnet2.train.preprocessor.CommonPreprocessor object at 0x1470ada19790>)
+[v020] 2025-11-30 08:43:52,535 (abs_task:1885) INFO: [valid] Batch sampler: NumElementsBatchSampler(N-batch=597, batch_bins=2000000, sort_in_batch=descending, sort_batch=descending)
+[v020] 2025-11-30 08:43:52,535 (abs_task:1886) INFO: [valid] mini-batch sizes summary: N-batch=597, mean=9.3, min=2, max=38
+[v020] 2025-11-30 08:43:52,579 (read_text:31) INFO: keys_to_load is not None, only loading 5551 keys from dump/raw/dev/text
+[v020] 2025-11-30 08:43:52,623 (asr:510) INFO: Optional Data Names: ('text_spk2', 'text_spk3', 'text_spk4', 'prompt')
+[v020] 2025-11-30 08:43:52,623 (abs_task:1910) INFO: [valid] dataset:
+ESPnetDataset(
+  speech: {"path": "dump/raw/dev/wav.scp", "type": "kaldi_ark"}
+  text: {"path": "dump/raw/dev/text", "type": "text"}
+  preprocess: <espnet2.train.preprocessor.CommonPreprocessor object at 0x1470b5d36010>)
+[v020] 2025-11-30 08:43:54,803 (abs_task:1587) INFO: wandb not configured! run `wandb login` to enable
+[v020] 2025-11-30 08:43:56,457 (trainer:336) INFO: 1/60epoch started
+Failed to import Flash Attention, using ESPnet default: No module named 'flash_attn'
+/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/train/trainer.py:638: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(
+/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/asr/espnet_model.py:402: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.
+  with autocast(self.autocast_frontend, dtype=autocast_type):
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/asr_train.py", line 23, in <module>
+    main()
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/asr_train.py", line 19, in main
+    ASRTask.main(cmd=cmd)
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/tasks/abs_task.py", line 1281, in main
+    cls.main_worker(args)
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/tasks/abs_task.py", line 1638, in main_worker
+    cls.trainer.run(
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/train/trainer.py", line 343, in run
+    all_steps_are_invalid = cls.train_one_epoch(
+                            ^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/train/trainer.py", line 643, in train_one_epoch
+    retval = model(**batch)
+             ^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/asr/espnet_model.py", line 257, in forward
+    encoder_out, encoder_out_lens = self.encode(speech, speech_lengths)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/asr/espnet_model.py", line 432, in encode
+    encoder_out, encoder_out_lens, _ = self.encoder(feats, feats_lengths)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/asr/encoder/hnet_encoder.py", line 136, in forward
+    x, mask = layer(x, mask=mask)
+              ^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/asr/encoder/mamba.py", line 164, in forward
+    out, mask = self.mixer(self.norm(x), mask=mask)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1739, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1750, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/asr/encoder/mamba.py", line 212, in forward
+    y, mask = self.ssm(x_inner, mask)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/asr/encoder/mamba.py", line 240, in ssm
+    return self.selective_scan(x, delta, A, B, C, D, mask)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/asr/encoder/mamba.py", line 270, in selective_scan
+    return y + u * D, mask
+           ~~^~~~~~~
+RuntimeError: The size of tensor a (6) must match the size of tensor b (1218) at non-singleton dimension 2
+STARTING FORWARD.....torch.Size([6, 1218, 80])
+EMBEDDING........torch.Size([6, 1218, 256])
+# Accounting: time=140 threads=1
+# Ended (code 1) at Sun Nov 30 08:44:11 EST 2025, elapsed time 140 seconds
+

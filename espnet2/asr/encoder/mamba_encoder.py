@@ -10,22 +10,6 @@ from espnet.nets.pytorch_backend.transformer.embedding import RelPositionalEncod
 from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling, check_short_utt, TooShortUttError
 import math
 
-@dataclass
-class EncoderArgs:
-    d_model: int
-    n_layer: int
-    d_state: int = 16
-    expand: int = 2
-    dt_rank: int = "auto"
-    d_conv: int = 4
-    conv_bias: bool = True
-    bias: bool = False
-
-    def __post_init__(self):
-        self.d_inner = int(self.expand * self.d_model)
-        if self.dt_rank == "auto":
-            self.dt_rank = math.ceil(self.d_model / 16)
-
 class RMSNorm(nn.Module):
     def __init__(self, d_model, eps=1e-5):
         super().__init__()
@@ -36,32 +20,42 @@ class RMSNorm(nn.Module):
         return x * torch.rsqrt(x.pow(2).mean(-1, keepdim=True) + self.eps) * self.weight
     
 class MambaBlock(nn.Module):
-    def __init__(self, args: EncoderArgs):
+    def __init__(self, 
+        d_model: int = 256,
+        n_layer: int = 2,
+        d_state: int = 16,
+        expand: int = 2,
+        dt_rank: int = "auto",
+        d_conv: int = 4,
+        conv_bias: bool = True,
+        bias: bool = False,
+    ):
         """A single Mamba block, as described in Figure 3 in Section 3.4 in the Mamba paper [1]."""
         super().__init__()
-        self.args = args
-
-        self.in_proj = nn.Linear(args.d_model, args.d_inner * 2, bias=args.bias)
+        self.d_inner = int(expand * d_model)
+        if dt_rank == "auto":
+            self.dt_rank = math.ceil(d_model / 16)
+        self.in_proj = nn.Linear(d_model, self.d_inner * 2, bias=bias)
 
         self.conv1d = nn.Conv1d(
-            in_channels=args.d_inner,
-            out_channels=args.d_inner,
-            bias=args.conv_bias,
-            kernel_size=args.d_conv,
-            groups=args.d_inner,
-            padding=args.d_conv - 1,
+            in_channels=self.d_inner,
+            out_channels=self.d_inner,
+            bias=conv_bias,
+            kernel_size=d_conv,
+            groups=self.d_inner,
+            padding=d_conv - 1,
         )
 
         # x_proj takes in `x` and outputs the input-specific Δ, B, C
-        self.x_proj = nn.Linear(args.d_inner, args.dt_rank + args.d_state * 2, bias=False)
+        self.x_proj = nn.Linear(self.d_inner, self.dt_rank + d_state * 2, bias=False)
         
         # dt_proj projects Δ from dt_rank to d_in
-        self.dt_proj = nn.Linear(args.dt_rank, args.d_inner, bias=True)
+        self.dt_proj = nn.Linear(self.dt_rank, self.d_inner, bias=True)
 
-        A = repeat(torch.arange(1, args.d_state + 1), 'n -> d n', d=args.d_inner)
+        A = repeat(torch.arange(1, d_state + 1), 'n -> d n', d=self.d_inner)
         self.A_log = nn.Parameter(torch.log(A))
-        self.D = nn.Parameter(torch.ones(args.d_inner))
-        self.out_proj = nn.Linear(args.d_inner, args.d_model, bias=args.bias)
+        self.D = nn.Parameter(torch.ones(self.d_inner))
+        self.out_proj = nn.Linear(self.d_inner, d_model, bias=bias)
         
 
     def forward(self, x):
@@ -81,7 +75,7 @@ class MambaBlock(nn.Module):
         (b, l, d) = x.shape
         
         x_and_res = self.in_proj(x)  # shape (b, l, 2 * d_in)
-        (x, res) = x_and_res.split(split_size=[self.args.d_inner, self.args.d_inner], dim=-1)
+        (x, res) = x_and_res.split(split_size=[self.d_inner, self.d_inner], dim=-1)
 
         x = rearrange(x, 'b l d_in -> b d_in l')
         x = self.conv1d(x)[:, :, :l]
@@ -125,7 +119,7 @@ class MambaBlock(nn.Module):
 
         x_dbl = self.x_proj(x)  # (b, l, dt_rank + 2*n)
         
-        (delta, B, C) = x_dbl.split(split_size=[self.args.dt_rank, n, n], dim=-1)  # delta: (b, l, dt_rank). B, C: (b, l, n)
+        (delta, B, C) = x_dbl.split(split_size=[self.dt_rank, n, n], dim=-1)  # delta: (b, l, dt_rank). B, C: (b, l, n)
         delta = F.softplus(self.dt_proj(delta))  # (b, l, d_in)
         
         y = self.selective_scan(x, delta, A, B, C, D)  # This is similar to run_SSM(A, B, C, u) in The Annotated S4 [2]
@@ -186,10 +180,22 @@ class MambaBlock(nn.Module):
         return y
     
 class ResidualBlock(nn.Module):
-    def __init__(self, args: EncoderArgs):
+    def __init__(self,
+        d_model: int = 256,
+        n_layer: int = 2,
+        d_state: int = 16,
+        expand: int = 2,
+        dt_rank: int = "auto",
+        d_conv: int = 4,
+        conv_bias: bool = True,
+        bias: bool = False,
+    ):
         super().__init__()
-        self.norm = RMSNorm(args.d_model)
-        self.mixer = MambaBlock(args)
+        self.norm = RMSNorm(d_model)
+        self.mixer = MambaBlock(
+            d_model=d_model, n_layer=n_layer, d_state=d_state, expand=expand,
+            dt_rank=dt_rank, d_conv=d_conv, conv_bias=conv_bias, bias=bias
+        )
 
     def forward(self, x):
         return x + self.mixer(self.norm(x))
@@ -198,25 +204,33 @@ class MambaEncoder(AbsEncoder):
     def __init__(
         self,
         input_size: int,
-        args: EncoderArgs,
+        output_size: int = 256,
+        d_model: int = 256,
+        n_layer: int = 2,
+        d_state: int = 16,
+        expand: int = 2,
+        dt_rank: int = "auto",
+        d_conv: int = 4,
+        conv_bias: bool = True,
+        bias: bool = False,
+        positional_dropout_rate: float = 0.1,
+        dropout_rate: float = 0.1,
+        max_pos_emb_len: int = 5000,
     ):
         super().__init__()
-        self.args = args
-        self._output_size = args.d_model
+        self._output_size = output_size
 
         # self.embed = nn.Linear(input_size, args.d_model)
         self.embed = Conv2dSubsampling(
                 input_size,
-                args.d_model,
-                0.1,
-                RelPositionalEncoding(args.d_model, 0.1, 5000),
+                d_model,
+                positional_dropout_rate,
+                RelPositionalEncoding(d_model, positional_dropout_rate, max_pos_emb_len),
             )
 
-        self.layers = nn.ModuleList([ResidualBlock(args) for _ in range(args.n_layer)])
-        self.norm_f = RMSNorm(args.d_model)
-
-        # simple positional embeddings
-        self.pos_emb = nn.Parameter(torch.randn(1, 20000, args.d_model))
+        self.layers = nn.ModuleList([ResidualBlock(d_model=d_model, n_layer=n_layer, d_state=d_state, expand=expand,
+            dt_rank=dt_rank, d_conv=d_conv, conv_bias=conv_bias, bias=bias) for _ in range(n_layer)])
+        self.norm_f = RMSNorm(d_model)
     
     def output_size(self) -> int:
         return self._output_size

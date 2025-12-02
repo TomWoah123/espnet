@@ -1,5 +1,5 @@
 from espnet2.asr.encoder.conformer_encoder import ConformerEncoder
-from espnet2.asr.encoder.mamba_encoder import MambaEncoder, EncoderArgs
+from espnet2.asr.encoder.mamba_encoder import MambaEncoder
 import torch
 
 input_tensor = torch.ones(size=(8, 1582, 80))
@@ -13,8 +13,7 @@ print(encoder.embed)
 output, output_lens, _ = encoder(input_tensor, input_lens)
 print(output.shape, output_lens.shape)
 
-args = EncoderArgs(d_model=256, n_layer=2)
-mamba_encoder = MambaEncoder(80, args)
+mamba_encoder = MambaEncoder(input_size=80)
 print(mamba_encoder.embed)
 output, output_lens, _ = mamba_encoder(input_tensor, input_lens)
 print(output.shape, output_lens.shape)

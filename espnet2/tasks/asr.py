@@ -33,6 +33,7 @@ from espnet2.asr.encoder.contextual_block_conformer_encoder import (
     ContextualBlockConformerEncoder,
 )
 from espnet2.asr.encoder.hnet_encoder import HNetEncoder
+from espnet2.asr.encoder.mamba_encoder import MambaEncoder
 from espnet2.asr.encoder.contextual_block_transformer_encoder import (
     ContextualBlockTransformerEncoder,
 )
@@ -154,6 +155,7 @@ encoder_choices = ClassChoices(
         conformer=ConformerEncoder,
         transformer=TransformerEncoder,
         hnet=HNetEncoder,
+        mamba=MambaEncoder,
         transformer_multispkr=TransformerEncoderMultiSpkr,
         contextual_block_transformer=ContextualBlockTransformerEncoder,
         contextual_block_conformer=ContextualBlockConformerEncoder,

@@ -142,7 +142,7 @@ class HNetEncoder(AbsEncoder):
             masks = (~make_pad_mask(olens)).to(xs_pad.device)
         else:
             masks = ~masks[:, None, :]
-        print(f"XS_PAD.............{xs_pad.shape}, MASKS..................{masks.shape}")
+        # print(f"XS_PAD.............{xs_pad.shape}, MASKS..................{masks.shape}")
         bpred_output = self.routing_module(
             xs_pad,
             cu_seqlens=None,
@@ -153,9 +153,10 @@ class HNetEncoder(AbsEncoder):
         xs_pad, next_cu_seqlens, next_max_seqlen, next_mask = self.chunking_layer(
             xs_pad, boundary_mask, None, mask=masks
         )
+        # print(f"AFTER CHUNKING.............{xs_pad.shape}")
         xs_pad = self.main_layers(
             xs_pad,
-            src_key_padding_mask=next_mask  # Transformer expects False=keep, True=pad
+            # src_key_padding_mask=next_mask  # Transformer expects False=keep, True=pad
         )
         xs_pad = self.norm_main(xs_pad)
         xs_pad = self.dechunking_layer(

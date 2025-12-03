@@ -6,50 +6,95 @@ import torch.nn.functional as F
 
 from einops import repeat, rearrange
 
-def simple_mamba_scan(u, dt, A, B, C, D=None, z=None, dt_bias=None, initial_state=None):
+def simple_mamba_scan(u, dt, A, B, C, D=None, z=None, initial_state=None):
     """
-    u:      (batch, L, d_in)
-    dt:     (batch, L, )             # or (batch, L, something) depending design
-    A:      (d_in, n)                # state dimension n
-    B:      (batch, L, n)
-    C:      (batch, L, n)
-    D:      (d_in,) or (d_in,1)      # optional skip connection
-    z:      gating (optional)
-    initial_state: (batch, n) or None
+    A robust Mamba-style scan that matches the caller shapes.
+
+    Args:
+        u: (B, L, H, P)  input per time, per head, per head-dim p
+        dt: (B, L, H) or broadcastable  time-step scalars
+        A: (H,) or (H,1)          per-head scalar (continuous A -> discrete by exp(A * dt))
+        B: (B, L, 1, 1) or broadcastable  input gain scalar(s)
+        C: (B, L, 1, 1) or broadcastable  output gain scalar(s)
+        D: optional (P,) or (1,1,P)       skip weight over u
+        z: optional gating (B, L, H, P)   elementwise multiply on state after update
+        initial_state: (B, H, P) or None
+
+    Returns:
+        y: (B, L, H, P)
     """
-    u = u.squeeze(1)
-    BATCH, L, _ = u.shape
-    n = A.shape[1]
+    # Validate shapes / coerce
+    if u.ndim != 4:
+        raise ValueError("u must have shape (B, L, H, P)")
 
-    # Discretize A (for example) — depends on continuous → discrete mapping
-    # Here: naive, no discretization
-    # Optionally incorporate dt to get deltaA, deltaB as you had before
-    deltaA = torch.exp(dt.unsqueeze(-1) * A.unsqueeze(0).unsqueeze(0))  # (batch, L, d_in, n) if A shaped (d_in, n)
-    # But for simplicity, assume dt=1, A already discrete:
-    deltaA = A  # broadcast later as needed
+    BATCH, L, H, P = u.shape
+    device = u.device
+    dtype = u.dtype
 
-    # Prepare state
-    x = initial_state if (initial_state is not None) else torch.zeros((BATCH, n), device=u.device)
+    # Ensure dt is (B, L, H)
+    dt = dt.to(device=device, dtype=dtype)
+    if dt.ndim == 2:
+        # maybe (B, L) -> expand to heads
+        dt = dt.unsqueeze(-1).expand(BATCH, L, H)
+    elif dt.ndim == 1:
+        # (L,) -> expand
+        dt = dt.unsqueeze(0).unsqueeze(-1).expand(BATCH, L, H)
+    # A -> (H,)
+    A = A.to(device=device, dtype=dtype).reshape(-1)
+    if A.numel() != H:
+        # allow scalar A broadcast if needed
+        if A.numel() == 1:
+            A = A.expand(H)
+        else:
+            raise ValueError(f"A must have length H={H} or be scalar; got {A.shape}")
+
+    # Broadcast A to (B, L, H) to compute decay
+    # A is (H,), dt is (B,L,H) -> decay (B,L,H)
+    decay = torch.exp(A.view(1, 1, H) * dt)
+
+    # Prepare B and C to broadcast to (B, L, H, P)
+    B_ = B.to(device=device, dtype=dtype)
+    C_ = C.to(device=device, dtype=dtype)
+    # Expand last dims if necessary
+    B_ = B_.reshape(BATCH, L, 1, 1).expand(BATCH, L, H, P)
+    C_ = C_.reshape(BATCH, L, 1, 1).expand(BATCH, L, H, P)
+
+    # initial state
+    if initial_state is None:
+        x = torch.zeros((BATCH, H, P), device=device, dtype=dtype)
+    else:
+        x = initial_state.to(device=device, dtype=dtype)
+        if x.shape != (BATCH, H, P):
+            raise ValueError("initial_state must be (B, H, P)")
 
     outputs = []
-    for i in range(L):
-        # State update
-        # B_i = B[:, i, :]  # (batch, n)
-        x = (x.unsqueeze(-1) * deltaA).sum(-2)  # e.g. if deltaA mixes dims — adjust accordingly
-        x = x + B[:, i, :]
+    for t in range(L):
+        # decay_t shape (B, H) -> expand to (B, H, P)
+        decay_t = decay[:, t, :].unsqueeze(-1)  # (B, H, 1)
+        u_t = u[:, t, :, :]                       # (B, H, P)
+        B_t = B_[:, t, :, :]                      # (B, H, P)
 
-        # Optionally apply gating z
+        # x <- decay * x + B_t * u_t
+        x = decay_t * x + B_t * u_t               # broadcasting to (B, H, P)
+
+        # optional gating z (must match shape)
         if z is not None:
-            x = x * z[:, i, :]
+            z_t = z[:, t, :, :]
+            x = x * z_t
 
-        # Output projection
-        y = (x * C[:, i, :]).sum(-1)  # or another matmul
+        # output y = C_t * x + D * u_t (D broadcasted over P)
+        C_t = C_[:, t, :, :]
+        y = C_t * x
+
         if D is not None:
-            y = y + u[:, i, :] * D
+            D_ = D.to(device=device, dtype=dtype)
+            # D may be (P,) or (1,1,P); normalize to (P,)
+            D_ = D_.reshape(-1) if D_.ndim >= 1 else D_.expand(P)
+            y = y + u_t * D_.view(1, 1, P)
 
         outputs.append(y)
 
-    return torch.stack(outputs, dim=1)  # (batch, L, output_dim)
+    return torch.stack(outputs, dim=1)  # (B, L, H, P)
 
 def get_seq_idx(cu_seqlens, device=None):
     seq_idx = torch.zeros(cu_seqlens[-1], dtype=torch.long, device=device)

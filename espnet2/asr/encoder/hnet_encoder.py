@@ -6,8 +6,56 @@ from typeguard import typechecked
 import torch.nn.functional as F
 
 from espnet.nets.pytorch_backend.nets_utils import make_pad_mask
-from espnet2.asr.encoder.mamba import Mamba, ModelArgs, ResidualBlock
-# from espnet.nets.pytorch_backend.transformer.embedding import RelPositionalEncoding
+from espnet2.asr.encoder.mamba_encoder import MambaEncoder
+from espnet2.asr.encoder.dynamic_chunking import DeChunkLayer, DeChunkState, ChunkLayer, RoutingModule, RoutingModuleOutput, RoutingModuleState
+from dataclasses import dataclass, field
+from typing import Union, Optional
+import optree
+
+@dataclass
+class IsotropicInferenceParams:
+    """Inference parameters that are passed to the main model in order
+    to efficienly calculate and store the context during inference."""
+
+    max_seqlen: int
+    max_batch_size: int
+    seqlen_offset: int = 0
+    batch_size_offset: int = 0
+    key_value_memory_dict: dict = field(default_factory=dict)
+    lengths_per_sample: Optional[torch.Tensor] = None
+
+    def reset(self, max_seqlen, max_batch_size):
+        self.max_seqlen = max_seqlen
+        self.max_batch_size = max_batch_size
+        self.seqlen_offset = 0
+        if self.lengths_per_sample is not None:
+            self.lengths_per_sample.zero_()
+
+        optree.tree_map(
+            lambda x: x.zero_() if isinstance(x, torch.Tensor) else x,
+            self.key_value_memory_dict,
+        )
+
+@dataclass
+class HNetState:
+    encoder_state: Optional[IsotropicInferenceParams] = None
+    routing_module_state: Optional[RoutingModuleState] = None
+    main_network_state: Optional[Union["HNetState", IsotropicInferenceParams]] = None
+    dechunk_state: Optional[DeChunkState] = None
+    decoder_state: Optional[IsotropicInferenceParams] = None
+
+class STE(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, x):
+        return torch.ones_like(x)
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        grad_x = grad_output
+        return grad_x
+
+def ste_func(x):
+    return STE.apply(x)
 
 
 
@@ -18,10 +66,10 @@ class HNetEncoder(AbsEncoder):
         input_size: int,
         output_size: int = 256,
         hidden_size: int = 256,
+        d_model: int = 256,
         # Architecture depth configuration
         num_encoder_layers: int = 2,  # Depth of epsilon (E)
         num_main_layers: int = 2,     # Depth of Main (M)
-        num_decoder_layers: int = 2,  # Depth of Delta (D)
         # Hierarchy configuration
         downsample_rate: int = 4,
         # Mamba configuration
@@ -42,29 +90,11 @@ class HNetEncoder(AbsEncoder):
         self._output_size = output_size
         self.downsample_rate = downsample_rate
         self.hidden_size = hidden_size
+        self.d_model = d_model
 
-        # 1. Input Projection
-        self.embed = nn.Sequential(
-            nn.Linear(input_size, hidden_size),
-            nn.LayerNorm(hidden_size),
-            nn.Dropout(dropout),
-            # RelPositionalEncoding(output_size, positional_dropout_rate, max_pos_emb_len),
-        )
-
-        # 2. Encoder (E) - Fine-grained processing
-        model_args = ModelArgs(d_model=hidden_size, d_state=mamba_d_state, d_conv=mamba_d_conv, expand=mamba_expand)
-        self.encoder_layers = nn.ModuleList([
-            ResidualBlock(model_args)
-            for _ in range(num_encoder_layers)
-        ])
-        self.norm_enc = nn.LayerNorm(hidden_size)
-
-        # 3. Chunking Layer (Downsampling)
-        # Reduces Sequence Length by factor R
-        self.chunking_proj = nn.Sequential(
-            nn.Conv1d(hidden_size, hidden_size, kernel_size=downsample_rate, stride=downsample_rate),
-            nn.BatchNorm1d(hidden_size)
-        )
+        self.encoder = MambaEncoder(input_size=input_size, output_size=output_size, n_layer=num_encoder_layers)
+        self.routing_module = RoutingModule(d_model=d_model)
+        self.chunking_layer = ChunkLayer()
 
         # 4. Main Network (M) - Coarse-grained processing (Bottleneck)
         encoder_layer = nn.TransformerEncoderLayer(
@@ -81,23 +111,14 @@ class HNetEncoder(AbsEncoder):
             num_layers=num_main_layers
         )
         self.norm_main = nn.LayerNorm(hidden_size)
-
-        # 5. Dechunking Layer (Upsampling)
-        # Restores Sequence Length
-        self.dechunking_proj = nn.Sequential(
-            nn.ConvTranspose1d(hidden_size, hidden_size, kernel_size=downsample_rate, stride=downsample_rate),
-            nn.BatchNorm1d(hidden_size)
+        self.dechunking_layer = DeChunkLayer(d_model=d_model)
+        self.residual_proj = nn.Linear(
+            self.d_model, self.d_model, dtype=torch.float32
         )
+        nn.init.zeros_(self.residual_proj.weight)
+        self.residual_proj.weight._no_reinit = True
 
-        # 6. Decoder (D) - Fine-grained reconstruction
-        self.decoder_layers = nn.ModuleList([
-            ResidualBlock(model_args)
-            for _ in range(num_decoder_layers)
-        ])
-        self.norm_dec = nn.LayerNorm(hidden_size)
-
-        # Final projection to output size
-        self.output_proj = nn.Linear(hidden_size, output_size)
+        self.residual_func = lambda out, residual, p: out * ste_func(p) + residual
     
     def output_size(self) -> int:
         return self._output_size
@@ -111,88 +132,44 @@ class HNetEncoder(AbsEncoder):
         ctc=None,
         return_all_hs: bool = False,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
-        print(f"STARTING FORWARD.....{xs_pad.shape}")
-        B, T, _ = xs_pad.shape
-        device = xs_pad.device
-
-        # -------------------------
-        # Compute input mask: (B, T)
-        # -------------------------
-        if masks is None:
-            mask = ~make_pad_mask(ilens).to(device)
-        else:
-            mask = ~masks.to(device)
-
-        # -------------------------
-        # 1. Input embedding
-        # -------------------------
-        x = self.embed(xs_pad)  # (B, T, D)
-        print(f"EMBEDDING........{x.shape}")
-
-        # -------------------------
-        # 2. Encoder (E) — Mamba w/ mask
-        # -------------------------
-        for layer in self.encoder_layers:
-            x, mask = layer(x, mask=mask)
-
-        x = self.norm_enc(x)
-        T_orig = x.size(1)
-
-        # -------------------------
-        # 3. Chunking
-        # -------------------------
-        R = self.downsample_rate
-        if T_orig % R != 0:
-            pad_len = R - (T_orig % R)
-            x = F.pad(x, (0, 0, 0, pad_len))  # pad time
-            mask = F.pad(mask, (0, pad_len), value=False)
-        else:
-            pad_len = 0
-
-        x_chunk = self.chunking_proj(x.transpose(1, 2)).transpose(1, 2)  # (B, T/R, D)
-
-        ilens_sub = torch.ceil(ilens / R).long()
-        mask_sub = ~make_pad_mask(ilens_sub).to(device)  # (B, T/R)
-
-        # -------------------------
-        # 4. Main Transformer (M)
-        # -------------------------
-        x_main = self.main_layers(
-            x_chunk,
-            src_key_padding_mask=~mask_sub  # Transformer expects False=keep, True=pad
+        inference_params = HNetState(main_network_state=None)
+        xs_pad, olens, _ = self.encoder.forward(xs_pad=xs_pad, ilens=ilens, prev_states=prev_states, masks=masks, ctc=ctc, return_all_hs=return_all_hs)
+        xs_pad_hs_for_residual = xs_pad.to(
+            dtype=self.residual_proj.weight.dtype
         )
-        x_main = self.norm_main(x_main)
+        xs_pad_residual = self.residual_proj(xs_pad_hs_for_residual)
+        if masks is None:
+            masks = (~make_pad_mask(olens)).to(xs_pad.device)
+        else:
+            masks = ~masks[:, None, :]
+        print(f"XS_PAD.............{xs_pad.shape}, MASKS..................{masks.shape}")
+        bpred_output = self.routing_module(
+            xs_pad,
+            cu_seqlens=None,
+            mask=masks,
+            inference_params=inference_params.routing_module_state,
+        )
+        boundary_mask = bpred_output.boundary_mask.squeeze(1)
+        xs_pad, next_cu_seqlens, next_max_seqlen, next_mask = self.chunking_layer(
+            xs_pad, boundary_mask, None, mask=masks
+        )
+        xs_pad = self.main_layers(
+            xs_pad,
+            src_key_padding_mask=next_mask  # Transformer expects False=keep, True=pad
+        )
+        xs_pad = self.norm_main(xs_pad)
+        xs_pad = self.dechunking_layer(
+            xs_pad,
+            boundary_mask,
+            bpred_output.boundary_prob,
+            next_cu_seqlens,
+            mask=masks,
+            inference_params=inference_params.dechunk_state,
+        )
+        xs_pad = self.residual_func(
+            xs_pad.to(dtype=xs_pad_residual.dtype), xs_pad_residual, bpred_output.selected_probs
+        ).to(xs_pad.dtype)
 
-        # -------------------------
-        # 5. Dechunking
-        # -------------------------
-        x_up = self.dechunking_proj(x_main.transpose(1, 2)).transpose(1, 2)
-
-        # Trim or pad to T_orig + pad_len
-        T_exp = T_orig + pad_len
-        if x_up.size(1) > T_exp:
-            x_up = x_up[:, :T_exp, :]
-        elif x_up.size(1) < T_exp:
-            x_up = F.pad(x_up, (0, 0, 0, T_exp - x_up.size(1)))
-
-        # Remove padding
-        x_up = x_up[:, :T_orig, :]
-        mask_up = mask[:, :T_orig]
-
-        # -------------------------
-        # 6. Decoder (D) — Mamba w/ mask
-        # -------------------------
-        x_dec = x_up
-        for layer in self.decoder_layers:
-            x_dec, mask_up = layer(x_dec, mask=mask_up)
-
-        x_dec = self.norm_dec(x_dec)
-
-        # -------------------------
-        # Residual + Final Linear
-        # -------------------------
-        xs_emb = self.embed(xs_pad)
-        x_final = x_dec + xs_emb
-        out = self.output_proj(x_final)
-
-        return out, ilens, None
+        olens = masks.squeeze(1).sum(1)
+        return xs_pad, olens, None
+        

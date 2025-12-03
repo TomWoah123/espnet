@@ -126,57 +126,65 @@ class MambaBlock(nn.Module):
         
         return y
 
-    
     def selective_scan(self, u, delta, A, B, C, D):
-        """Does selective scan algorithm. See:
-            - Section 2 State Space Models in the Mamba paper [1]
-            - Algorithm 2 in Section 3.2 in the Mamba paper [1]
-            - run_SSM(A, B, C, u) in The Annotated S4 [2]
+        """Parallelized selective scan (no sequential Python loop)."""
 
-        This is the classic discrete state space formula:
-            x(t + 1) = Ax(t) + Bu(t)
-            y(t)     = Cx(t) + Du(t)
-        except B and C (and the step size delta, which is used for discretization) are dependent on the input x(t).
-    
-        Args:
-            u: shape (b, l, d_in)    (See Glossary at top for definitions of b, l, d_in, n...)
-            delta: shape (b, l, d_in)
-            A: shape (d_in, n)
-            B: shape (b, l, n)
-            C: shape (b, l, n)
-            D: shape (d_in,)
-    
-        Returns:
-            output: shape (b, l, d_in)
-    
-        Official Implementation:
-            selective_scan_ref(), https://github.com/state-spaces/mamba/blob/main/mamba_ssm/ops/selective_scan_interface.py#L86
-            Note: I refactored some parts out of `selective_scan_ref` out, so the functionality doesn't match exactly.
-            
-        """
+        # Shapes
         (b, l, d_in) = u.shape
         n = A.shape[1]
-        
-        # Discretize continuous parameters (A, B)
-        # - A is discretized using zero-order hold (ZOH) discretization (see Section 2 Equation 4 in the Mamba paper [1])
-        # - B is discretized using a simplified Euler discretization instead of ZOH. From a discussion with authors:
-        #   "A is the more important term and the performance doesn't change much with the simplification on B"
+
+        # -------------------------
+        # 1. Discretize parameters
+        # -------------------------
         deltaA = torch.exp(einsum(delta, A, 'b l d_in, d_in n -> b l d_in n'))
         deltaB_u = einsum(delta, B, u, 'b l d_in, b l n, b l d_in -> b l d_in n')
-        
-        # Perform selective scan (see scan_SSM() in The Annotated S4 [2])
-        # Note that the below is sequential, while the official implementation does a much faster parallel scan that
-        # is additionally hardware-aware (like FlashAttention).
-        x = torch.zeros((b, d_in, n), device=deltaA.device)
-        ys = []    
-        for i in range(l):
-            x = deltaA[:, i] * x + deltaB_u[:, i]
-            y = einsum(x, C[:, i, :], 'b d_in n, b n -> b d_in')
-            ys.append(y)
-        y = torch.stack(ys, dim=1)  # shape (b, l, d_in)
-        
-        y = y + u * D
-    
+
+        # -------------------------
+        # 2. Parallel prefix scan
+        #    over (A_i, B_i)
+        #
+        # Recurrence per step:
+        #   x_i = A_i * x_(i-1) + B_i
+        #
+        # Associative operator:
+        #   (A2, B2) ⊙ (A1, B1) = (A2*A1 , B2 + A2*B1)
+        # -------------------------
+
+        Avals = deltaA                       # (b, l, d_in, n)
+        Bvals = deltaB_u                     # (b, l, d_in, n)
+
+        step = 1
+        while step < l:
+            # Shifted A/B values
+            Ashift = torch.roll(Avals, shifts=step, dims=1)
+            Bshift = torch.roll(Bvals, shifts=step, dims=1)
+
+            # Zero-out invalid prefix regions
+            Ashift[:, :step] = 1.0           # multiplicative identity
+            Bshift[:, :step] = 0.0           # additive identity
+
+            # Combine using associative scan operator
+            # newA = A_i * A_(i-step)
+            # newB = B_i + A_i * B_(i-step)
+            newA = Avals * Ashift
+            newB = Bvals + Avals * Bshift
+
+            Avals, Bvals = newA, newB
+            step *= 2
+
+        # After scan:  Bvals[b, i] = x_i
+        X = Bvals                              # (b, l, d_in, n)
+
+        # -------------------------
+        # 3. Compute output y_i = C_i @ x_i
+        # -------------------------
+        y = (X * C.unsqueeze(2)).sum(dim=-1)   # (b, l, d_in)
+
+        # -------------------------
+        # 4. Add skip connection
+        # -------------------------
+        y = y + u * D                          # shape (b, l, d_in)
+
         return y
     
 class ResidualBlock(nn.Module):
@@ -214,7 +222,6 @@ class MambaEncoder(AbsEncoder):
         conv_bias: bool = True,
         bias: bool = False,
         positional_dropout_rate: float = 0.1,
-        dropout_rate: float = 0.1,
         max_pos_emb_len: int = 5000,
     ):
         super().__init__()
@@ -262,30 +269,16 @@ class MambaEncoder(AbsEncoder):
                 xs_pad.size(1),
                 limit_size,
             )
-        xs_pad, masks = self.embed(xs_pad, masks)
-        xs_pad = xs_pad[0]
 
         # 1. Input embedding
-        # (xs_pad, ilens), masks = self.embed(xs_pad, masks)
-        print(xs_pad.shape, masks.shape, ilens.shape)
-        # xs_pad = xs_pad + self.pos_emb[:, :T, :]
-
-        # 2. Mask creation
-        
-        masks_bt1 = masks      # (B,1,T)
-        masks_b1t = masks.transpose(1, 2)  # (B,T,1)
+        xs_pad, masks = self.embed(xs_pad, masks)
+        xs_pad = xs_pad[0]
         hs_all = []
 
         # 3. Mamba layers
         for i, layer in enumerate(self.layers):
-            # ---- (A) mask BEFORE the layer ----
-            xs_pad = xs_pad.masked_fill(masks_b1t, 0.0)
-
             # ---- Mamba block ----
             xs_pad = layer(xs_pad)
-
-            # ---- (B) mask AFTER residual ----
-            xs_pad = xs_pad.masked_fill(masks_b1t, 0.0)
 
             if return_all_hs:
                 hs_all.append(xs_pad)
@@ -295,8 +288,9 @@ class MambaEncoder(AbsEncoder):
 
         # 4. Final normalization
         xs_pad = self.norm_f(xs_pad)
+        olens = masks.squeeze(1).sum(1)
 
         if return_all_hs:
             return xs_pad, ilens, hs_all
 
-        return xs_pad, ilens, None
+        return xs_pad, olens, None

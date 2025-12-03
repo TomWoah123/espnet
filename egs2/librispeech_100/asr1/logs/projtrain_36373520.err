@@ -1,0 +1,136 @@
+2025-12-02 21:11:43,114 (launch:94) INFO: /ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/bin/python3 /ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/launch.py --cmd 'run.pl --name exp/asr_train_asr_raw_en_bpe5000_sp/train.log' --log exp/asr_train_asr_raw_en_bpe5000_sp/train.log --ngpu 1 --num_nodes 1 --init_file_prefix exp/asr_train_asr_raw_en_bpe5000_sp/.dist_init_ --multiprocessing_distributed true -- python3 -m espnet2.bin.asr_train --use_preprocessor true --bpemodel data/en_token_list/bpe_unigram5000/bpe.model --token_type bpe --token_list data/en_token_list/bpe_unigram5000/tokens.txt --non_linguistic_symbols none --cleaner none --g2p none --valid_data_path_and_name_and_type dump/raw/dev/wav.scp,speech,kaldi_ark --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape --resume true --ignore_init_mismatch false --fold_length 80000 --output_dir exp/asr_train_asr_raw_en_bpe5000_sp --config conf/train_asr.yaml --frontend_conf fs=16k --normalize=global_mvn --normalize_conf stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape --fold_length 150 --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/text,text,text --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe --valid_data_path_and_name_and_type dump/raw/dev/text,text,text --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe
+2025-12-02 21:11:43,235 (launch:348) INFO: log file: exp/asr_train_asr_raw_en_bpe5000_sp/train.log
+run.pl: job failed, log is in exp/asr_train_asr_raw_en_bpe5000_sp/train.log
+Command '['run.pl', '--name', 'exp/asr_train_asr_raw_en_bpe5000_sp/train.log', '--gpu', '1', 'exp/asr_train_asr_raw_en_bpe5000_sp/train.log', 'python3', '-m', 'espnet2.bin.asr_train', '--use_preprocessor', 'true', '--bpemodel', 'data/en_token_list/bpe_unigram5000/bpe.model', '--token_type', 'bpe', '--token_list', 'data/en_token_list/bpe_unigram5000/tokens.txt', '--non_linguistic_symbols', 'none', '--cleaner', 'none', '--g2p', 'none', '--valid_data_path_and_name_and_type', 'dump/raw/dev/wav.scp,speech,kaldi_ark', '--valid_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape', '--resume', 'true', '--ignore_init_mismatch', 'false', '--fold_length', '80000', '--output_dir', 'exp/asr_train_asr_raw_en_bpe5000_sp', '--config', 'conf/train_asr.yaml', '--frontend_conf', 'fs=16k', '--normalize=global_mvn', '--normalize_conf', 'stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz', '--train_data_path_and_name_and_type', 'dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark', '--train_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape', '--fold_length', '150', '--train_data_path_and_name_and_type', 'dump/raw/train_clean_100_sp/text,text,text', '--train_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe', '--valid_data_path_and_name_and_type', 'dump/raw/dev/text,text,text', '--valid_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe', '--ngpu', '1', '--multiprocessing_distributed', 'True']' returned non-zero exit status 1.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/launch.py", line 384, in <module>
+    main()
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/launch.py", line 375, in main
+    raise RuntimeError(
+RuntimeError: 
+################### The last 1000 lines of exp/asr_train_asr_raw_en_bpe5000_sp/train.log ###################
+# python3 -m espnet2.bin.asr_train --use_preprocessor true --bpemodel data/en_token_list/bpe_unigram5000/bpe.model --token_type bpe --token_list data/en_token_list/bpe_unigram5000/tokens.txt --non_linguistic_symbols none --cleaner none --g2p none --valid_data_path_and_name_and_type dump/raw/dev/wav.scp,speech,kaldi_ark --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape --resume true --ignore_init_mismatch false --fold_length 80000 --output_dir exp/asr_train_asr_raw_en_bpe5000_sp --config conf/train_asr.yaml --frontend_conf fs=16k --normalize=global_mvn --normalize_conf stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape --fold_length 150 --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/text,text,text --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe --valid_data_path_and_name_and_type dump/raw/dev/text,text,text --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe --ngpu 1 --multiprocessing_distributed True 
+# Started at Tue Dec  2 21:11:43 EST 2025
+#
+/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/bin/python3 /ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/asr_train.py --use_preprocessor true --bpemodel data/en_token_list/bpe_unigram5000/bpe.model --token_type bpe --token_list data/en_token_list/bpe_unigram5000/tokens.txt --non_linguistic_symbols none --cleaner none --g2p none --valid_data_path_and_name_and_type dump/raw/dev/wav.scp,speech,kaldi_ark --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape --resume true --ignore_init_mismatch false --fold_length 80000 --output_dir exp/asr_train_asr_raw_en_bpe5000_sp --config conf/train_asr.yaml --frontend_conf fs=16k --normalize=global_mvn --normalize_conf stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape --fold_length 150 --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/text,text,text --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe --valid_data_path_and_name_and_type dump/raw/dev/text,text,text --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe --ngpu 1 --multiprocessing_distributed True
+[v034] 2025-12-02 21:13:31,972 (asr:540) INFO: Vocabulary size: 5000
+[v034] 2025-12-02 21:13:43,402 (espnet_model:186) WARNING: Set decoder to none as ctc_weight==1.0
+[v034] 2025-12-02 21:13:43,481 (abs_task:1455) INFO: pytorch.version=2.6.0+cu126, cuda.available=True, cudnn.version=90501, cudnn.benchmark=False, cudnn.deterministic=True
+[v034] 2025-12-02 21:13:43,483 (abs_task:1456) INFO: Model structure:
+ESPnetASRModel(
+  (frontend): DefaultFrontend(
+    (stft): Stft(n_fft=512, win_length=400, hop_length=160, center=True, normalized=False, onesided=True)
+    (frontend): Frontend()
+    (logmel): LogMel(sr=16000, n_fft=512, n_mels=80, fmin=0, fmax=8000.0, htk=False)
+  )
+  (specaug): SpecAug(
+    (time_warp): TimeWarp(window=5, mode=bicubic)
+    (freq_mask): MaskAlongAxis(mask_width_range=[0, 27], num_mask=2, axis=freq)
+    (time_mask): MaskAlongAxisVariableMaxWidth(mask_width_ratio_range=[0.0, 0.05], num_mask=5, axis=time)
+  )
+  (normalize): GlobalMVN(stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz, norm_means=True, norm_vars=True)
+  (encoder): MambaEncoder(
+    (embed): Conv2dSubsampling(
+      (conv): Sequential(
+        (0): Conv2d(1, 256, kernel_size=(3, 3), stride=(2, 2))
+        (1): ReLU()
+        (2): Conv2d(256, 256, kernel_size=(3, 3), stride=(2, 2))
+        (3): ReLU()
+      )
+      (out): Sequential(
+        (0): Linear(in_features=4864, out_features=256, bias=True)
+        (1): RelPositionalEncoding(
+          (dropout): Dropout(p=0.1, inplace=False)
+        )
+      )
+    )
+    (layers): ModuleList(
+      (0-11): 12 x ResidualBlock(
+        (norm): RMSNorm()
+        (mixer): MambaBlock(
+          (in_proj): Linear(in_features=256, out_features=1024, bias=False)
+          (conv1d): Conv1d(512, 512, kernel_size=(4,), stride=(1,), padding=(3,), groups=512)
+          (x_proj): Linear(in_features=512, out_features=48, bias=False)
+          (dt_proj): Linear(in_features=16, out_features=512, bias=True)
+          (out_proj): Linear(in_features=512, out_features=256, bias=False)
+        )
+      )
+    )
+    (norm_f): RMSNorm()
+  )
+  (criterion_att): LabelSmoothingLoss(
+    (criterion): KLDivLoss()
+  )
+  (ctc): CTC(
+    (ctc_lo): Linear(in_features=256, out_features=5000, bias=True)
+    (ctc_loss): CTCLoss()
+  )
+)
+
+Model summary:
+    Class Name: ESPnetASRModel
+    Total Number of model parameters: 8.38 M
+    Number of trainable parameters: 8.38 M (100.0%)
+    Size: 33.52 MB
+    Type: torch.float32
+[v034] 2025-12-02 21:13:43,483 (abs_task:1459) INFO: Optimizer:
+Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    capturable: False
+    differentiable: False
+    eps: 1e-08
+    foreach: None
+    fused: None
+    initial_lr: 0.001
+    lr: 6.666666666666668e-08
+    maximize: False
+    weight_decay: 1e-06
+)
+[v034] 2025-12-02 21:13:43,483 (abs_task:1460) INFO: Scheduler: WarmupLR(warmup_steps=15000)
+[v034] 2025-12-02 21:13:43,484 (abs_task:1469) INFO: Saving the configuration in exp/asr_train_asr_raw_en_bpe5000_sp/config.yaml
+[v034] 2025-12-02 21:13:44,403 (abs_task:1885) INFO: [train] Batch sampler: NumElementsBatchSampler(N-batch=16120, batch_bins=2000000, sort_in_batch=descending, sort_batch=descending)
+[v034] 2025-12-02 21:13:44,405 (abs_task:1886) INFO: [train] mini-batch sizes summary: N-batch=16120, mean=5.3, min=1, max=32
+[v034] 2025-12-02 21:13:44,628 (read_text:31) INFO: keys_to_load is not None, only loading 85617 keys from dump/raw/train_clean_100_sp/text
+[v034] 2025-12-02 21:13:45,649 (asr:512) INFO: Optional Data Names: ('text_spk2', 'text_spk3', 'text_spk4', 'prompt')
+[v034] 2025-12-02 21:13:45,652 (abs_task:1910) INFO: [train] dataset:
+ESPnetDataset(
+  speech: {"path": "dump/raw/train_clean_100_sp/wav.scp", "type": "kaldi_ark"}
+  text: {"path": "dump/raw/train_clean_100_sp/text", "type": "text"}
+  preprocess: <espnet2.train.preprocessor.CommonPreprocessor object at 0x153f5de91450>)
+[v034] 2025-12-02 21:13:45,735 (abs_task:1885) INFO: [valid] Batch sampler: NumElementsBatchSampler(N-batch=597, batch_bins=2000000, sort_in_batch=descending, sort_batch=descending)
+[v034] 2025-12-02 21:13:45,736 (abs_task:1886) INFO: [valid] mini-batch sizes summary: N-batch=597, mean=9.3, min=2, max=38
+[v034] 2025-12-02 21:13:45,780 (read_text:31) INFO: keys_to_load is not None, only loading 5551 keys from dump/raw/dev/text
+[v034] 2025-12-02 21:13:45,834 (asr:512) INFO: Optional Data Names: ('text_spk2', 'text_spk3', 'text_spk4', 'prompt')
+[v034] 2025-12-02 21:13:45,834 (abs_task:1910) INFO: [valid] dataset:
+ESPnetDataset(
+  speech: {"path": "dump/raw/dev/wav.scp", "type": "kaldi_ark"}
+  text: {"path": "dump/raw/dev/text", "type": "text"}
+  preprocess: <espnet2.train.preprocessor.CommonPreprocessor object at 0x153f59606590>)
+[v034] 2025-12-02 21:13:48,765 (abs_task:1587) INFO: wandb not configured! run `wandb login` to enable
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/asr_train.py", line 23, in <module>
+    main()
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/asr_train.py", line 19, in main
+    ASRTask.main(cmd=cmd)
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/tasks/abs_task.py", line 1281, in main
+    cls.main_worker(args)
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/tasks/abs_task.py", line 1638, in main_worker
+    cls.trainer.run(
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/train/trainer.py", line 235, in run
+    cls.resume(
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/train/trainer.py", line 164, in resume
+    model.load_state_dict(states["model"], strict=strict)
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/lib/python3.11/site-packages/torch/nn/modules/module.py", line 2581, in load_state_dict
+    raise RuntimeError(
+RuntimeError: Error(s) in loading state_dict for ESPnetASRModel:
+	Missing key(s) in state_dict: "encoder.layers.2.norm.weight", "encoder.layers.2.mixer.A_log", "encoder.layers.2.mixer.D", "encoder.layers.2.mixer.in_proj.weight", "encoder.layers.2.mixer.conv1d.weight", "encoder.layers.2.mixer.conv1d.bias", "encoder.layers.2.mixer.x_proj.weight", "encoder.layers.2.mixer.dt_proj.weight", "encoder.layers.2.mixer.dt_proj.bias", "encoder.layers.2.mixer.out_proj.weight", "encoder.layers.3.norm.weight", "encoder.layers.3.mixer.A_log", "encoder.layers.3.mixer.D", "encoder.layers.3.mixer.in_proj.weight", "encoder.layers.3.mixer.conv1d.weight", "encoder.layers.3.mixer.conv1d.bias", "encoder.layers.3.mixer.x_proj.weight", "encoder.layers.3.mixer.dt_proj.weight", "encoder.layers.3.mixer.dt_proj.bias", "encoder.layers.3.mixer.out_proj.weight", "encoder.layers.4.norm.weight", "encoder.layers.4.mixer.A_log", "encoder.layers.4.mixer.D", "encoder.layers.4.mixer.in_proj.weight", "encoder.layers.4.mixer.conv1d.weight", "encoder.layers.4.mixer.conv1d.bias", "encoder.layers.4.mixer.x_proj.weight", "encoder.layers.4.mixer.dt_proj.weight", "encoder.layers.4.mixer.dt_proj.bias", "encoder.layers.4.mixer.out_proj.weight", "encoder.layers.5.norm.weight", "encoder.layers.5.mixer.A_log", "encoder.layers.5.mixer.D", "encoder.layers.5.mixer.in_proj.weight", "encoder.layers.5.mixer.conv1d.weight", "encoder.layers.5.mixer.conv1d.bias", "encoder.layers.5.mixer.x_proj.weight", "encoder.layers.5.mixer.dt_proj.weight", "encoder.layers.5.mixer.dt_proj.bias", "encoder.layers.5.mixer.out_proj.weight", "encoder.layers.6.norm.weight", "encoder.layers.6.mixer.A_log", "encoder.layers.6.mixer.D", "encoder.layers.6.mixer.in_proj.weight", "encoder.layers.6.mixer.conv1d.weight", "encoder.layers.6.mixer.conv1d.bias", "encoder.layers.6.mixer.x_proj.weight", "encoder.layers.6.mixer.dt_proj.weight", "encoder.layers.6.mixer.dt_proj.bias", "encoder.layers.6.mixer.out_proj.weight", "encoder.layers.7.norm.weight", "encoder.layers.7.mixer.A_log", "encoder.layers.7.mixer.D", "encoder.layers.7.mixer.in_proj.weight", "encoder.layers.7.mixer.conv1d.weight", "encoder.layers.7.mixer.conv1d.bias", "encoder.layers.7.mixer.x_proj.weight", "encoder.layers.7.mixer.dt_proj.weight", "encoder.layers.7.mixer.dt_proj.bias", "encoder.layers.7.mixer.out_proj.weight", "encoder.layers.8.norm.weight", "encoder.layers.8.mixer.A_log", "encoder.layers.8.mixer.D", "encoder.layers.8.mixer.in_proj.weight", "encoder.layers.8.mixer.conv1d.weight", "encoder.layers.8.mixer.conv1d.bias", "encoder.layers.8.mixer.x_proj.weight", "encoder.layers.8.mixer.dt_proj.weight", "encoder.layers.8.mixer.dt_proj.bias", "encoder.layers.8.mixer.out_proj.weight", "encoder.layers.9.norm.weight", "encoder.layers.9.mixer.A_log", "encoder.layers.9.mixer.D", "encoder.layers.9.mixer.in_proj.weight", "encoder.layers.9.mixer.conv1d.weight", "encoder.layers.9.mixer.conv1d.bias", "encoder.layers.9.mixer.x_proj.weight", "encoder.layers.9.mixer.dt_proj.weight", "encoder.layers.9.mixer.dt_proj.bias", "encoder.layers.9.mixer.out_proj.weight", "encoder.layers.10.norm.weight", "encoder.layers.10.mixer.A_log", "encoder.layers.10.mixer.D", "encoder.layers.10.mixer.in_proj.weight", "encoder.layers.10.mixer.conv1d.weight", "encoder.layers.10.mixer.conv1d.bias", "encoder.layers.10.mixer.x_proj.weight", "encoder.layers.10.mixer.dt_proj.weight", "encoder.layers.10.mixer.dt_proj.bias", "encoder.layers.10.mixer.out_proj.weight", "encoder.layers.11.norm.weight", "encoder.layers.11.mixer.A_log", "encoder.layers.11.mixer.D", "encoder.layers.11.mixer.in_proj.weight", "encoder.layers.11.mixer.conv1d.weight", "encoder.layers.11.mixer.conv1d.bias", "encoder.layers.11.mixer.x_proj.weight", "encoder.layers.11.mixer.dt_proj.weight", "encoder.layers.11.mixer.dt_proj.bias", "encoder.layers.11.mixer.out_proj.weight". 
+Failed to import Flash Attention, using ESPnet default: No module named 'flash_attn'
+# Accounting: time=132 threads=1
+# Ended (code 1) at Tue Dec  2 21:13:55 EST 2025, elapsed time 132 seconds
+

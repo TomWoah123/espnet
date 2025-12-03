@@ -229,11 +229,11 @@ class MambaEncoder(AbsEncoder):
 
         # self.embed = nn.Linear(input_size, args.d_model)
         self.embed = Conv2dSubsampling(
-                input_size,
-                d_model,
-                positional_dropout_rate,
-                RelPositionalEncoding(d_model, positional_dropout_rate, max_pos_emb_len),
-            )
+            input_size,
+            d_model,
+            positional_dropout_rate,
+            RelPositionalEncoding(d_model, positional_dropout_rate, max_pos_emb_len),
+        )
 
         self.layers = nn.ModuleList([ResidualBlock(d_model=d_model, n_layer=n_layer, d_state=d_state, expand=expand,
             dt_rank=dt_rank, d_conv=d_conv, conv_bias=conv_bias, bias=bias) for _ in range(n_layer)])

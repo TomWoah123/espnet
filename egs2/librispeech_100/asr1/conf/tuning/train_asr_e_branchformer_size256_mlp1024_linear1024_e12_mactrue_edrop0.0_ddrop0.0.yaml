@@ -20,13 +20,6 @@ encoder: hnet
 encoder_conf:
     hidden_size: 256
     num_encoder_layers: 2
-    num_main_layers: 2
-    num_decoder_layers: 2
-    downsample_rate: 4
-    mamba_d_state: 16
-    mamba_d_conv: 4
-    mamba_expand: 2
-    dropout: 0.1
 
 # encoder: transformer
 # encoder_conf:

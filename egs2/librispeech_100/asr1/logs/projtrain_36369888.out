@@ -1,0 +1,6 @@
+2025-12-02T19:39:35 (asr.sh:285:main) ./asr.sh --lang en --ngpu 1 --nj 16 --gpu_inference true --inference_nj 2 --nbpe 5000 --max_wav_duration 30 --speed_perturb_factors 0.9 1.0 1.1 --audio_format flac.ark --feats_type raw --use_lm false --asr_config conf/train_asr.yaml --inference_config conf/decode_asr.yaml --train_set train_clean_100 --valid_set dev --test_sets test_clean --lm_train_text data/train_clean_100/text --bpe_train_text data/train_clean_100/text --stage 11 --stop-stage 11
+2025-12-02T19:39:37 (asr.sh:566:main) Skipped stages:  6 7 8 9 14 15 
+2025-12-02T19:39:37 (asr.sh:1310:main) Stage 11: ASR Training: train_set=dump/raw/train_clean_100_sp, valid_set=dump/raw/dev
+2025-12-02T19:39:37 (asr.sh:1409:main) Generate 'exp/asr_train_asr_raw_en_bpe5000_sp/run.sh'. You can resume the process from stage 11 using this script
+2025-12-02T19:39:37 (asr.sh:1413:main) ASR training started... log: 'exp/asr_train_asr_raw_en_bpe5000_sp/train.log'
+2025-12-02T19:39:37 (asr.sh:1451:main) Use ESPnet trainer

@@ -6,8 +6,13 @@ from typeguard import typechecked
 import torch.nn.functional as F
 
 from espnet.nets.pytorch_backend.nets_utils import make_pad_mask
+## IMPORT MAMBA HERE
 from espnet2.asr.encoder.mamba_encoder import MambaEncoder
+
+## REPLACE BELOW WITH ACTUAL mamba_ssm stuff
 from espnet2.asr.encoder.dynamic_chunking import DeChunkLayer, DeChunkState, ChunkLayer, RoutingModule, RoutingModuleOutput, RoutingModuleState
+from espnet.nets.pytorch_backend.transformer.embedding import RelPositionalEncoding
+from espnet.nets.pytorch_backend.transformer.subsampling import Conv2dSubsampling, check_short_utt, TooShortUttError
 from dataclasses import dataclass, field
 from typing import Union, Optional
 import optree
@@ -91,8 +96,14 @@ class HNetEncoder(AbsEncoder):
         self.downsample_rate = downsample_rate
         self.hidden_size = hidden_size
         self.d_model = d_model
+        self.embed = Conv2dSubsampling(
+            input_size,
+            d_model,
+            positional_dropout_rate,
+            RelPositionalEncoding(d_model, positional_dropout_rate, max_pos_emb_len),
+        )
 
-        self.encoder = MambaEncoder(input_size=input_size, output_size=output_size, n_layer=num_encoder_layers)
+        # self.encoder = Mamba(....)
         self.routing_module = RoutingModule(d_model=d_model)
         self.chunking_layer = ChunkLayer()
 
@@ -132,8 +143,28 @@ class HNetEncoder(AbsEncoder):
         ctc=None,
         return_all_hs: bool = False,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
-        inference_params = HNetState(main_network_state=None)
-        xs_pad, olens, _ = self.encoder.forward(xs_pad=xs_pad, ilens=ilens, prev_states=prev_states, masks=masks, ctc=ctc, return_all_hs=return_all_hs)
+        B, T, _ = xs_pad.shape
+        if masks is None:
+            masks = (~make_pad_mask(ilens)[:, None, :]).to(xs_pad.device)
+        else:
+            masks = ~masks[:, None, :]
+        
+        short_status, limit_size = check_short_utt(self.embed, xs_pad.size(1))
+        if short_status:
+            raise TooShortUttError(
+                f"has {xs_pad.size(1)} frames and is too short for subsampling "
+                + f"(it needs more than {limit_size} frames), return empty results",
+                xs_pad.size(1),
+                limit_size,
+            )
+
+        # 1. Input embedding
+        xs_pad, masks = self.embed(xs_pad, masks)
+        xs_pad = xs_pad[0]
+        # hs_all = []
+        # CALL MAMBA ENCODER HERE
+        #..........
+        
         xs_pad_hs_for_residual = xs_pad.to(
             dtype=self.residual_proj.weight.dtype
         )

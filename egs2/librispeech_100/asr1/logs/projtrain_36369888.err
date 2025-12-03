@@ -1,0 +1,38 @@
+2025-12-02 19:39:49,857 (launch:94) INFO: /ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/bin/python3 /ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/launch.py --cmd 'run.pl --name exp/asr_train_asr_raw_en_bpe5000_sp/train.log' --log exp/asr_train_asr_raw_en_bpe5000_sp/train.log --ngpu 1 --num_nodes 1 --init_file_prefix exp/asr_train_asr_raw_en_bpe5000_sp/.dist_init_ --multiprocessing_distributed true -- python3 -m espnet2.bin.asr_train --use_preprocessor true --bpemodel data/en_token_list/bpe_unigram5000/bpe.model --token_type bpe --token_list data/en_token_list/bpe_unigram5000/tokens.txt --non_linguistic_symbols none --cleaner none --g2p none --valid_data_path_and_name_and_type dump/raw/dev/wav.scp,speech,kaldi_ark --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape --resume true --ignore_init_mismatch false --fold_length 80000 --output_dir exp/asr_train_asr_raw_en_bpe5000_sp --config conf/train_asr.yaml --frontend_conf fs=16k --normalize=global_mvn --normalize_conf stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape --fold_length 150 --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/text,text,text --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe --valid_data_path_and_name_and_type dump/raw/dev/text,text,text --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe
+2025-12-02 19:39:50,000 (launch:348) INFO: log file: exp/asr_train_asr_raw_en_bpe5000_sp/train.log
+run.pl: job failed, log is in exp/asr_train_asr_raw_en_bpe5000_sp/train.log
+Command '['run.pl', '--name', 'exp/asr_train_asr_raw_en_bpe5000_sp/train.log', '--gpu', '1', 'exp/asr_train_asr_raw_en_bpe5000_sp/train.log', 'python3', '-m', 'espnet2.bin.asr_train', '--use_preprocessor', 'true', '--bpemodel', 'data/en_token_list/bpe_unigram5000/bpe.model', '--token_type', 'bpe', '--token_list', 'data/en_token_list/bpe_unigram5000/tokens.txt', '--non_linguistic_symbols', 'none', '--cleaner', 'none', '--g2p', 'none', '--valid_data_path_and_name_and_type', 'dump/raw/dev/wav.scp,speech,kaldi_ark', '--valid_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape', '--resume', 'true', '--ignore_init_mismatch', 'false', '--fold_length', '80000', '--output_dir', 'exp/asr_train_asr_raw_en_bpe5000_sp', '--config', 'conf/train_asr.yaml', '--frontend_conf', 'fs=16k', '--normalize=global_mvn', '--normalize_conf', 'stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz', '--train_data_path_and_name_and_type', 'dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark', '--train_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape', '--fold_length', '150', '--train_data_path_and_name_and_type', 'dump/raw/train_clean_100_sp/text,text,text', '--train_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe', '--valid_data_path_and_name_and_type', 'dump/raw/dev/text,text,text', '--valid_shape_file', 'exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe', '--ngpu', '1', '--multiprocessing_distributed', 'True']' returned non-zero exit status 1.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/launch.py", line 384, in <module>
+    main()
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/launch.py", line 375, in main
+    raise RuntimeError(
+RuntimeError: 
+################### The last 1000 lines of exp/asr_train_asr_raw_en_bpe5000_sp/train.log ###################
+# python3 -m espnet2.bin.asr_train --use_preprocessor true --bpemodel data/en_token_list/bpe_unigram5000/bpe.model --token_type bpe --token_list data/en_token_list/bpe_unigram5000/tokens.txt --non_linguistic_symbols none --cleaner none --g2p none --valid_data_path_and_name_and_type dump/raw/dev/wav.scp,speech,kaldi_ark --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape --resume true --ignore_init_mismatch false --fold_length 80000 --output_dir exp/asr_train_asr_raw_en_bpe5000_sp --config conf/train_asr.yaml --frontend_conf fs=16k --normalize=global_mvn --normalize_conf stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape --fold_length 150 --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/text,text,text --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe --valid_data_path_and_name_and_type dump/raw/dev/text,text,text --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe --ngpu 1 --multiprocessing_distributed True 
+# Started at Tue Dec  2 19:39:50 EST 2025
+#
+/ocean/projects/cis250187p/twu13/final-project/espnet/tools/miniconda/envs/espnet/bin/python3 /ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/asr_train.py --use_preprocessor true --bpemodel data/en_token_list/bpe_unigram5000/bpe.model --token_type bpe --token_list data/en_token_list/bpe_unigram5000/tokens.txt --non_linguistic_symbols none --cleaner none --g2p none --valid_data_path_and_name_and_type dump/raw/dev/wav.scp,speech,kaldi_ark --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/speech_shape --resume true --ignore_init_mismatch false --fold_length 80000 --output_dir exp/asr_train_asr_raw_en_bpe5000_sp --config conf/train_asr.yaml --frontend_conf fs=16k --normalize=global_mvn --normalize_conf stats_file=exp/asr_stats_raw_en_bpe5000_sp/train/feats_stats.npz --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/wav.scp,speech,kaldi_ark --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/speech_shape --fold_length 150 --train_data_path_and_name_and_type dump/raw/train_clean_100_sp/text,text,text --train_shape_file exp/asr_stats_raw_en_bpe5000_sp/train/text_shape.bpe --valid_data_path_and_name_and_type dump/raw/dev/text,text,text --valid_shape_file exp/asr_stats_raw_en_bpe5000_sp/valid/text_shape.bpe --ngpu 1 --multiprocessing_distributed True
+[v034] 2025-12-02 19:42:41,911 (asr:540) INFO: Vocabulary size: 5000
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/asr_train.py", line 23, in <module>
+    main()
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/bin/asr_train.py", line 19, in main
+    ASRTask.main(cmd=cmd)
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/tasks/abs_task.py", line 1281, in main
+    cls.main_worker(args)
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/tasks/abs_task.py", line 1414, in main_worker
+    model = cls.build_model(args=args)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/ocean/projects/cis250187p/twu13/final-project/espnet/espnet2/tasks/asr.py", line 581, in build_model
+    encoder = encoder_class(input_size=input_size, **args.encoder_conf)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: MambaEncoder.__init__() got an unexpected keyword argument 'dropout_rate'
+Failed to import Flash Attention, using ESPnet default: No module named 'flash_attn'
+# Accounting: time=185 threads=1
+# Ended (code 1) at Tue Dec  2 19:42:55 EST 2025, elapsed time 185 seconds
+

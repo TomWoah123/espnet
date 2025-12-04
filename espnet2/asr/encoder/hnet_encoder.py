@@ -7,6 +7,7 @@ import torch.nn.functional as F
 
 from espnet.nets.pytorch_backend.nets_utils import make_pad_mask
 ## IMPORT MAMBA HERE
+from mamba_ssm import Mamba2
 from espnet2.asr.encoder.mamba_encoder import MambaEncoder
 
 ## REPLACE BELOW WITH ACTUAL mamba_ssm stuff
@@ -103,7 +104,7 @@ class HNetEncoder(AbsEncoder):
             RelPositionalEncoding(d_model, positional_dropout_rate, max_pos_emb_len),
         )
 
-        # self.encoder = Mamba(....)
+        self.encoder = Mamba2(d_model=d_model, d_state=mamba_d_state, d_conv=mamba_d_conv, expand=mamba_expand)
         self.routing_module = RoutingModule(d_model=d_model)
         self.chunking_layer = ChunkLayer()
 
@@ -163,7 +164,7 @@ class HNetEncoder(AbsEncoder):
         xs_pad = xs_pad[0]
         # hs_all = []
         # CALL MAMBA ENCODER HERE
-        #..........
+        xs_pad = self.encoder(xs_pad)
         
         xs_pad_hs_for_residual = xs_pad.to(
             dtype=self.residual_proj.weight.dtype

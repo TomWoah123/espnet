@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from einops import repeat, rearrange
+from mamba_ssm.ops.triton.ssd_combined import mamba_chunk_scan_combined
 
 def simple_mamba_scan(u, dt, A, B, C, D=None, z=None, initial_state=None):
     """
@@ -375,7 +376,7 @@ class DeChunkLayer(nn.Module):
         b = p.to(self.dtype)
         c = torch.ones_like(b)
 
-        out = simple_mamba_scan(
+        out = mamba_chunk_scan_combined(
             rearrange(x, "b l (h p) -> b l h p", p=self.headdim),
             repeat(dt, "b l -> b l h", h=self.nheads),
             A,
